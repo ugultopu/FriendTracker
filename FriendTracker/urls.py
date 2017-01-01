@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from FriendTrackerApp.views import login
 
 urlpatterns = [
+    url(r'^login/$', login),
     url(r'^admin/', admin.site.urls),
 ]
