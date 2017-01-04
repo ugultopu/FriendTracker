@@ -7,21 +7,16 @@ import json
 
 @channel_session_user_from_http
 def location_connect(message):
-    user = OnlineUser(user=message.user, reply_channel=message.reply_channel)
-    user.save()
+    Group('online-users').add(message.reply_channel)
 
 
 @channel_session_user
 def location_receive(message):
-    #print(message.content['text']) # This is what is sent from the client
     data = json.loads(message.content['text'])
-
-    timestamp = data['timestamp']
-    latitude = data['latitude']
-    longitude = data['longitude']
-
-    location = Location(user=message.user, timestamp=timestamp, latitude=latitude, longitude=longitude)
-    location.save()
+    print(data)
+    Group('online-users').send({
+        'text': json.dumps(data)
+    })
 
 
 @channel_session_user
@@ -31,8 +26,7 @@ def location_send(message):
 
 @channel_session_user
 def location_disconnect(message):
-    user = OnlineUser.objects.get(user=message.user)
-    user.delete()
+    Group('online-users').remove(message.reply_channel)
 
 
 
