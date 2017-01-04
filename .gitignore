@@ -6,8 +6,11 @@
 *.pot
 *.py[co]
 .tox/
+*.swp
+dump.rdb
 __pycache__
 MANIFEST
+migrations/
 dist/
 docs/_build/
 docs/locale/
