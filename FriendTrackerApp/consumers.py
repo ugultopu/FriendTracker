@@ -13,6 +13,8 @@ def location_connect(message):
 @channel_session_user
 def location_receive(message):
     data = json.loads(message.content['text'])
+    data['user'] = message.user.id
+    # detlog(message.user)
     print(data)
     Group('online-users').send({
         'text': json.dumps(data)
@@ -26,7 +28,7 @@ def location_send(message):
 
 @channel_session_user
 def location_disconnect(message):
-    Group('online-users').remove(message.reply_channel)
+    Group('online-users').discard(message.reply_channel)
 
 
 
