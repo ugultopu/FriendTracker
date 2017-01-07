@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from FriendTrackerApp.views import login
+from FriendTrackerApp.views import login, register
 
 urlpatterns = [
     url(r'^login/$', login),
+    url(r'^register/$', register),
     url(r'^admin/', admin.site.urls),
 ]
