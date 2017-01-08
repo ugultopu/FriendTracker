@@ -46,24 +46,9 @@ def register(request):
         user = User.objects.create_user(username, email, password,
                 first_name=firstname, last_name=lastname)
         user.save()
-        user = auth.authenticate(username=username, password=password)
-        if user is not None:
-            try:
-                auth.login(request, user)
-                detlog(request.session)
-                session_key = request.session.session_key
-                if session_key is not None:
-                    return HttpResponse(json.dumps({'status': 'Success',
-                        'sessionid': session_key}))
-                else:
-                    return HttpResponse(json.dumps({'status': 'Empty session key'}))
-            except Exception as e:
-                detlog(e)
-                return HttpResponse(json.dumps({'status': 'Cannot log in'}))
-        else:
-            return HttpResponse(json.dumps({'status': 'Cannot authenticate'}))
+        return HttpResponse(json.dumps({'status': 'Success'}))
     except:
-        return HttpResponse(json.dumps({'status': 'Unknown error'}))
+        return HttpResponse(json.dumps({'status': 'Cannot create user'}))
 
 
 
