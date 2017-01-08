@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
-#from .detlogging import detlog
+from .detlogging import detlog
 
 
 @csrf_exempt
@@ -13,10 +13,20 @@ def login(request):
     password = request.POST['password']
     user = auth.authenticate(username=username, password=password)
     if user is not None:
-        auth.login(request, user)
-        return HttpResponse(json.dumps({'status': 0,
-                                        'sessionid': request.session.session_key}))
-    return HttpResponse(json.dumps({'status': 1}))
+        try:
+            auth.login(request, user)
+            detlog(request.session)
+            session_key = request.session.session_key
+            if session_key is not None:
+                return HttpResponse(json.dumps({'status': 'Success',
+                    'sessionid': session_key}))
+            else:
+                return HttpResponse(json.dumps({'status': 'Empty session key'}))
+        except Exception as e:
+            detlog(e)
+            return HttpResponse(json.dumps({'status': 'Cannot log in'}))
+    else:
+        return HttpResponse(json.dumps({'status': 'Cannot authenticate'}))
 
 
 @csrf_exempt
@@ -38,12 +48,22 @@ def register(request):
         user.save()
         user = auth.authenticate(username=username, password=password)
         if user is not None:
-            auth.login(request, user)
-            return HttpResponse(json.dumps({'status': 0,
-                                            'sessionid': request.session.session_key}))
-        return HttpResponse(json.dumps({'status': 1}))
+            try:
+                auth.login(request, user)
+                detlog(request.session)
+                session_key = request.session.session_key
+                if session_key is not None:
+                    return HttpResponse(json.dumps({'status': 'Success',
+                        'sessionid': session_key}))
+                else:
+                    return HttpResponse(json.dumps({'status': 'Empty session key'}))
+            except Exception as e:
+                detlog(e)
+                return HttpResponse(json.dumps({'status': 'Cannot log in'}))
+        else:
+            return HttpResponse(json.dumps({'status': 'Cannot authenticate'}))
     except:
-        return HttpResponse(json.dumps({'status': 1}))
+        return HttpResponse(json.dumps({'status': 'Unknown error'}))
 
 
 
