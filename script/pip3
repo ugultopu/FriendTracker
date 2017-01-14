@@ -1,0 +1,9 @@
+function pip () {
+	_pip3 "$@"
+}
+pip "$@"
+if [ $? -eq 0 ]
+then
+	pip freeze > ../FriendTracker/requirements.txt
+fi
+
