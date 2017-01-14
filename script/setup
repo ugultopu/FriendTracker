@@ -1,0 +1,9 @@
+# TODO: Check if the `pip3` or `pip` is being used and take actions
+# accordingly.
+if [ ! -f ../bin/_pip3 ]; then
+	mv ../bin/pip3 ../bin/_pip3
+	cp script/pip3 ../bin/
+fi
+pip install -r requirements.txt
+script/runserver
+

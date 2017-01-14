@@ -1,7 +1,0 @@
-# TODO: Check if the `pip3` or `pip` is being used and take actions
-# accordingly.
-# FIXME: This will overwrite the original pip3 if this script is invoked
-# more than once. I need to find a solution for this.
-mv ../bin/pip3 ../bin/_pip3
-cp script/pip3 ../bin/
-

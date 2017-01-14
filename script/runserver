@@ -1,0 +1,12 @@
+kill_processes() {
+	kill $stunnel_pid
+	# For some reason, it seems like we don't need to kill the Redis manually.
+	# kill $redis_pid
+}
+trap kill_processes exit
+redis-server &
+redis_pid=$!
+stunnel stunnel/dev_https &
+stunnel_pid=$!
+python manage.py runserver
+
