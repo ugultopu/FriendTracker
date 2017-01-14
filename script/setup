@@ -5,5 +5,4 @@ if [ ! -f ../bin/_pip3 ]; then
 	cp script/pip3 ../bin/
 fi
 pip install -r requirements.txt
-script/runserver
 
