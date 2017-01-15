@@ -25,7 +25,7 @@ SECRET_KEY = '!$=6b_!)c=a%k8si*6sciga20qnb*#-fl3&1g6p9zb3bjfb_4d'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['95.85.20.216']
 
 #SECURE_SSL_REDIRECT = True
 
