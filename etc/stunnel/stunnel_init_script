@@ -5,7 +5,6 @@
 
 STUNNELPORT=8443
 EXEC=/usr/local/bin/stunnel
-CLIEXEC=/usr/local/bin/stunnel
 
 PIDFILE=/var/run/stunnel_${STUNNELPORT}.pid
 CONF="/etc/stunnel/${STUNNELPORT}.conf"

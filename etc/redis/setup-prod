@@ -1,8 +1,8 @@
 sudo mkdir /etc/redis
 sudo mkdir /var/redis
 
-sudo cp script/redis/redis_init_script /etc/init.d/redis_6379
-sudo cp script/redis/6379.conf /etc/redis/6379.conf
+sudo cp etc/redis/redis_init_script /etc/init.d/redis_6379
+sudo cp etc/redis/redis.conf /etc/redis/6379.conf
 
 sudo mkdir -p /var/redis/6379
 
