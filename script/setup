@@ -2,7 +2,7 @@
 # accordingly.
 if [ ! -f ../bin/_pip3 ]; then
 	mv ../bin/pip3 ../bin/_pip3
-	cp etc/pip3 ../bin/
+	cp script/pip3 ../bin/
 fi
 pip install -r requirements.txt
 
