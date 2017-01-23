@@ -8,6 +8,7 @@ import json
 @channel_session_user_from_http
 def location_connect(message):
     Group('online-users').add(message.reply_channel)
+    message.reply_channel.send({'accept': True})
 
 
 @channel_session_user
