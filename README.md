@@ -1,6 +1,7 @@
 # Prerequisites #
 1. Python 3.6 or higher
 2. [Redis](https://redis.io/)
+3. [Stunnel](https://www.stunnel.org)
 
 # Set Up #
 1. `python -m venv FriendTracker-Env`
