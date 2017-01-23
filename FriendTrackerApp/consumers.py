@@ -28,7 +28,7 @@ def location_send(message):
 
 @channel_session_user
 def location_disconnect(message):
+    message.channel_session.flush()
+    message.channel_session.modified = False
     Group('online-users').discard(message.reply_channel)
-
-
 

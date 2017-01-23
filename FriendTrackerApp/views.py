@@ -15,7 +15,6 @@ def login(request):
     if user is not None:
         try:
             auth.login(request, user)
-            detlog(request.session)
             session_key = request.session.session_key
             if session_key is not None:
                 return HttpResponse(json.dumps({'status': 'Success',
