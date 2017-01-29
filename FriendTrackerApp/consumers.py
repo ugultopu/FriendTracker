@@ -1,7 +1,6 @@
 from channels.auth import channel_session_user_from_http, channel_session_user
 from channels import Group
-from FriendTrackerApp.models import Location, OnlineUser, Follower
-from django.contrib.sessions.models import Session
+from FriendTrackerApp.models import Location, OnlineUser, Follower, CustomSession
 from .detlogging import detlog
 import json
 
@@ -41,7 +40,7 @@ def location_disconnect(message):
 
 
 def delete_session(user_id):
-    for session in Session.objects.all():
+    for session in CustomSession.objects.all():
         if session.get_decoded().get('__auth_user_id') == user_id:
             session.delete()
 
