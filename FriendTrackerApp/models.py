@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.sessions.base_session import AbstractBaseSession
 from django.db import models
+from FriendTrackerApp.sessions import SessionStore
 
 
 class Location(models.Model):
