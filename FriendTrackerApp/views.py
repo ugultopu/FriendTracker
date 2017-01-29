@@ -3,6 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from FriendTrackerApp.models import Follower
 import json
 from .detlogging import detlog
 
@@ -48,6 +49,26 @@ def register(request):
         return HttpResponse(json.dumps({'status': 'Success'}))
     except:
         return HttpResponse(json.dumps({'status': 'Cannot create user'}))
+
+
+@csrf_exempt
+def follow(request):
+    follower = request.user
+    try:
+        followee_username = request.POST['username']
+        followee = User.objects.get(username=followee_username)
+    except:
+        return HttpResponse(json.dumps({'status': 'Followee not found'}))
+    try:
+        Follower.objects.get(follower=follower, followee=followee)
+        return HttpResponse(json.dumps({'status': 'Success'}))
+    except:
+        pass
+    try:
+        Follower.objects.create(follower=follower, followee=followee)
+    except:
+        return HttpResponse(json.dumps({'status': 'Follow action failed'}))
+    return HttpResponse(json.dumps({'status': 'Success'}))
 
 
 
