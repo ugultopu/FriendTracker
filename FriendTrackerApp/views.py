@@ -59,6 +59,9 @@ def follow(request):
         followee = User.objects.get(username=followee_username)
     except:
         return HttpResponse(json.dumps({'status': 'Followee not found'}))
+    # TODO Decide if it should be possible to follow yourself
+    if follower == followee:
+        return HttpResponse(json.dumps({'status': 'Success'}))
     try:
         Follower.objects.get(follower=follower, followee=followee)
         return HttpResponse(json.dumps({'status': 'Success'}))
