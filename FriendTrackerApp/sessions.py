@@ -8,8 +8,6 @@ class SessionStore(DBStore):
         return models.CustomSession
 
     def create_model_instance(self, data):
-        import pdb
-        pdb.set_trace()
         obj = super(SessionStore, self).create_model_instance(data)
         try:
             account_id = int(data.get('_auth_user_id'))
@@ -17,8 +15,4 @@ class SessionStore(DBStore):
             account_id = None
         obj.account_id = account_id
         return obj
-
-    def set_account_id(self, value):
-        self['_account_id'] = value
-
 
