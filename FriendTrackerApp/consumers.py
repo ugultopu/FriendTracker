@@ -7,6 +7,8 @@ import json
 
 @channel_session_user_from_http
 def location_connect(message):
+    message.http_session.flush()
+    message.http_session.modified = False
     Group('online-users').add(message.reply_channel)
     message.reply_channel.send({'accept': True})
 
@@ -30,18 +32,15 @@ def location_send(message):
 @channel_session_user
 def location_disconnect(message):
     message.channel_session.flush()
-    # FIXME With a new commit, the line below is no longer needed to ensure
-    # session deletion. Remove it after testing that session gets deleted upon
-    # removing the line.
+    # FIXME With a new commit to Django Channels, the
+    #     message.channel_session.modified = False
+    # line is no longer needed to ensure session deletion. Remove it after
+    # testing that session gets deleted upon removing the line.
+    # NOTE You might want to use Django's logout function, since Django's
+    # logout function signals that the user has logged out. You might need
+    # this functionality if other users need to know if a particular user has
+    # logged out (that is, disconnected).
+    message.channel_session.flush()
     message.channel_session.modified = False
-    user_id = message.channel_session.get('__auth_user_id')
-    delete_session(user_id)
     Group('online-users').discard(message.reply_channel)
-
-
-def delete_session(user_id):
-    for session in CustomSession.objects.all():
-        if session.get_decoded().get('__auth_user_id') == user_id:
-            session.delete()
-
 
