@@ -10,7 +10,11 @@ def location_connect(message):
     message.http_session.flush()
     message.http_session.modified = False
     Group('online-users').add(message.reply_channel)
-    message.reply_channel.send({'accept': True})
+    data = {'sessionid': message.channel_session.session_key}
+    message.reply_channel.send({
+        'accept': True,
+        'text': json.dumps(data)
+    })
 
 
 @channel_session_user
