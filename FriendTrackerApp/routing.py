@@ -8,6 +8,5 @@ location_routing = [
     route('websocket.receive', location_receive),
     route('websocket.send', location_send),
     route('websocket.disconnect', location_disconnect),
-    route('http.request', location_operations),
 ]
 

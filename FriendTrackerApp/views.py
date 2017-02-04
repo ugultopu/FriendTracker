@@ -77,14 +77,13 @@ def follow(request):
 @csrf_exempt
 def location_operations(request):
     try:
-        request_body = json.load(request.body)
+        request_body = json.loads(request.body)
     except:
         return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
     try:
         command = request_body['command']
     except:
         return HttpResponse(json.dumps({'status': 'No command specified'}))
-
     if command == 'save':
         # Save a location to data base.
         try:
