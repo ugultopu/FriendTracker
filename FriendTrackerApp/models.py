@@ -12,6 +12,12 @@ class Location(models.Model):
     longitude = models.FloatField()
 
 
+class PinnedLocation(models.Model):
+    user = models.ForeignKey(User)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+
 class OnlineUser(models.Model):
     user = models.ForeignKey(User)
     reply_channel = models.TextField()

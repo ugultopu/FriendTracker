@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from FriendTrackerApp.models import Follower
+from FriendTrackerApp.models import Follower, PinnedLocation
 import json
 from .detlogging import detlog
 
@@ -73,5 +73,39 @@ def follow(request):
         return HttpResponse(json.dumps({'status': 'Follow action failed'}))
     return HttpResponse(json.dumps({'status': 'Success'}))
 
+
+@csrf_exempt
+def location_operations(request):
+    try:
+        request_body = json.load(request.body)
+    except:
+        return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
+    try:
+        command = request_body['command']
+    except:
+        return HttpResponse(json.dumps({'status': 'No command specified'}))
+
+    if command == 'save':
+        # Save a location to data base.
+        try:
+            latitude = request_body['latitude']
+            longitude = request_body['longitude']
+        except:
+            return HttpResponse(json.dumps({'status': 'Bad command parameters'}))
+        try:
+            PinnedLocation.objects.create(user=request.user, latitude=latitude, longitude=longitude)
+        except:
+            return HttpResponse(json.dumps({'status': 'Cannot save location'}))
+        return HttpResponse(json.dumps({'status': 'Success'}))
+    elif command == 'load':
+        # Get all saved locations
+        try:
+            pinned_locations = PinnedLocation.objects.get(user=request.user)
+        except:
+            return HttpResponse(json.dumps({'status': 'Cannot get locations'}))
+        return HttpResponse(json.dumps({'status': 'Success',
+                                        'locations': pinned_locations}))
+    else:
+        return HttpResponse(json.dumps({'status': 'Unrecognized command'}))
 
 
