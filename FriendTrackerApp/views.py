@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from FriendTrackerApp.models import Follower, PinnedLocation
+from django.core import serializers
 import json
 from .detlogging import detlog
 
@@ -99,11 +100,11 @@ def location_operations(request):
     elif command == 'load':
         # Get all saved locations
         try:
-            pinned_locations = PinnedLocation.objects.get(user=request.user)
+            pinned_locations = PinnedLocation.objects.filter(user=request.user)
         except:
             return HttpResponse(json.dumps({'status': 'Cannot get locations'}))
         return HttpResponse(json.dumps({'status': 'Success',
-                                        'locations': pinned_locations}))
+                                        'locations': serializers.serialize('json', pinned_locations)}))
     else:
         return HttpResponse(json.dumps({'status': 'Unrecognized command'}))
 
