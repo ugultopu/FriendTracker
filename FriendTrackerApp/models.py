@@ -14,6 +14,7 @@ class Location(models.Model):
 
 class PinnedLocation(models.Model):
     user = models.ForeignKey(User)
+    name = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
 

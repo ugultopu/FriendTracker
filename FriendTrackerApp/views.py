@@ -88,12 +88,13 @@ def location_operations(request):
     if command == 'save':
         # Save a location to data base.
         try:
+            name = request_body['name']
             latitude = request_body['latitude']
             longitude = request_body['longitude']
         except:
             return HttpResponse(json.dumps({'status': 'Bad command parameters'}))
         try:
-            PinnedLocation.objects.create(user=request.user, latitude=latitude, longitude=longitude)
+            PinnedLocation.objects.create(user=request.user, name=name, latitude=latitude, longitude=longitude)
         except:
             return HttpResponse(json.dumps({'status': 'Cannot save location'}))
         return HttpResponse(json.dumps({'status': 'Success'}))
@@ -103,6 +104,9 @@ def location_operations(request):
             pinned_locations = PinnedLocation.objects.filter(user=request.user)
         except:
             return HttpResponse(json.dumps({'status': 'Cannot get locations'}))
+        # FIXME The default serializer includes a lot of unnecessary
+        # information as well in the sent JSON. Maybe I will manually serialize
+        # the pinned locations to a JSON.
         return HttpResponse(json.dumps({'status': 'Success',
                                         'locations': serializers.serialize('json', pinned_locations)}))
     else:
