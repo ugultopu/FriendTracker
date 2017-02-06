@@ -83,7 +83,7 @@ def follow(request):
 @csrf_exempt
 def location_operations(request):
     try:
-        request_body = json.loads(request.body.decode('utf-8'))
+        request_body = json.loads(request.body)
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
