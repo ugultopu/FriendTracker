@@ -7,6 +7,7 @@ from FriendTrackerApp.models import Follower, PinnedLocation
 from django.core import serializers
 import json
 from .detlogging import detlog
+import traceback
 
 
 @csrf_exempt
@@ -78,8 +79,9 @@ def follow(request):
 @csrf_exempt
 def location_operations(request):
     try:
-        request_body = json.loads(request.body)
+        request_body = json.loads(request.body.decode('utf-8'))
     except:
+        print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
     try:
         command = request_body['command']
