@@ -50,6 +50,7 @@ def register(request):
         user.save()
         return HttpResponse(json.dumps({'status': 'Success'}))
     except:
+        print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Cannot create user'}))
 
 
@@ -60,6 +61,7 @@ def follow(request):
         followee_username = request.POST['username']
         followee = User.objects.get(username=followee_username)
     except:
+        print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Followee not found'}))
     # TODO Decide if it should be possible to follow yourself
     if follower == followee:
@@ -68,10 +70,12 @@ def follow(request):
         Follower.objects.get(follower=follower, followee=followee)
         return HttpResponse(json.dumps({'status': 'Success'}))
     except:
+        print(traceback.format_exc())
         pass
     try:
         Follower.objects.create(follower=follower, followee=followee)
     except:
+        print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Follow action failed'}))
     return HttpResponse(json.dumps({'status': 'Success'}))
 
@@ -86,6 +90,7 @@ def location_operations(request):
     try:
         command = request_body['command']
     except:
+        print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'No command specified'}))
     if command == 'save':
         # Save a location to data base.
@@ -94,10 +99,12 @@ def location_operations(request):
             latitude = request_body['latitude']
             longitude = request_body['longitude']
         except:
+            print(traceback.format_exc())
             return HttpResponse(json.dumps({'status': 'Bad command parameters'}))
         try:
             PinnedLocation.objects.create(user=request.user, name=name, latitude=latitude, longitude=longitude)
         except:
+            print(traceback.format_exc())
             return HttpResponse(json.dumps({'status': 'Cannot save location'}))
         return HttpResponse(json.dumps({'status': 'Success'}))
     elif command == 'load':
@@ -105,6 +112,7 @@ def location_operations(request):
         try:
             pinned_locations = PinnedLocation.objects.filter(user=request.user)
         except:
+            print(traceback.format_exc())
             return HttpResponse(json.dumps({'status': 'Cannot get locations'}))
         # FIXME The default serializer includes a lot of unnecessary
         # information as well in the sent JSON. Maybe I will manually serialize
