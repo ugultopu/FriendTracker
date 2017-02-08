@@ -1,6 +1,7 @@
 from channels.auth import channel_session_user_from_http, channel_session_user
 from channels import Group
 from FriendTrackerApp.models import Location, OnlineUser, Follower, CustomSession
+from FriendTrackerApp.views import reply_channels
 from .detlogging import detlog
 import json
 
@@ -9,6 +10,7 @@ import json
 def location_connect(message):
     message.http_session.flush()
     message.http_session.modified = False
+    reply_channels[message.user.username] = message.reply_channel
     Group('online-users').add(message.reply_channel)
     data = {'sessionid': message.channel_session.session_key}
     message.reply_channel.send({
@@ -35,7 +37,6 @@ def location_send(message):
 
 @channel_session_user
 def location_disconnect(message):
-    message.channel_session.flush()
     # FIXME With a new commit to Django Channels, the
     #     message.channel_session.modified = False
     # line is no longer needed to ensure session deletion. Remove it after
@@ -46,5 +47,6 @@ def location_disconnect(message):
     # logged out (that is, disconnected).
     message.channel_session.flush()
     message.channel_session.modified = False
+    del reply_channels[message.user.username]
     Group('online-users').discard(message.reply_channel)
 

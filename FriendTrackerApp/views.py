@@ -9,6 +9,7 @@ import json
 from .detlogging import detlog
 import traceback
 
+reply_channels = {}
 
 @csrf_exempt
 def login(request):
@@ -63,20 +64,23 @@ def follow(request):
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Followee not found'}))
+
     # TODO Decide if it should be possible to follow yourself
-    if follower == followee:
-        return HttpResponse(json.dumps({'status': 'Success'}))
+    # if follower == followee:
+    #     return HttpResponse(json.dumps({'status': 'Success'}))
+
     try:
-        Follower.objects.get(follower=follower, followee=followee)
-        return HttpResponse(json.dumps({'status': 'Success'}))
+        followee_reply_channel = reply_channels[followee.username]
     except:
         print(traceback.format_exc())
-        pass
+        return HttpResponse(json.dumps({'status': 'Followee offline'}))
     try:
-        Follower.objects.create(follower=follower, followee=followee)
+        followee_reply_channel.send({
+            'text': '{} has requested to be followed'.format(follower.username)
+            })
     except:
         print(traceback.format_exc())
-        return HttpResponse(json.dumps({'status': 'Follow action failed'}))
+        return HttpResponse(json.dumps({'status': 'Cannot send follow request'}))
     return HttpResponse(json.dumps({'status': 'Success'}))
 
 
