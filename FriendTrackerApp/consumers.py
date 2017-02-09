@@ -23,8 +23,8 @@ def location_connect(message):
 def location_receive(message):
     data = json.loads(message.content['text'])
     data['user'] = message.user.id
-    # detlog(message.user)
     print(data)
+    data['command'] = 'location'
     Group('online-users').send({
         'text': json.dumps(data)
     })
