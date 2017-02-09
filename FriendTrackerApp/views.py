@@ -5,11 +5,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from FriendTrackerApp.models import Follower, PinnedLocation
 from django.core import serializers
+import uuid
 import json
 from .detlogging import detlog
 import traceback
 
 reply_channels = {}
+follows = {}
+follow_requests = {}
 
 @csrf_exempt
 def login(request):
@@ -57,26 +60,36 @@ def register(request):
 
 @csrf_exempt
 def follow(request):
-    follower = request.user
+    followee_username = request.user.username
     try:
-        followee_username = request.POST['username']
-        followee = User.objects.get(username=followee_username)
+        follower_username = request.POST['username']
+        follower = User.objects.get(username=follower_username)
     except:
         print(traceback.format_exc())
-        return HttpResponse(json.dumps({'status': 'Followee not found'}))
+        return HttpResponse(json.dumps({'status': 'Follower not found'}))
 
     # TODO Decide if it should be possible to follow yourself
-    # if follower == followee:
+    # if follower_username == followee_username:
     #     return HttpResponse(json.dumps({'status': 'Success'}))
 
     try:
-        followee_reply_channel = reply_channels[followee.username]
+        follower_reply_channel = reply_channels[follower_username]
     except:
         print(traceback.format_exc())
-        return HttpResponse(json.dumps({'status': 'Followee offline'}))
+        return HttpResponse(json.dumps({'status': 'Follower offline'}))
     try:
-        followee_reply_channel.send({
-            'text': '{} has requested to be followed'.format(follower.username)
+        token = str(uuid.uuid4())
+        follow_requests[token] = {
+                'followee_username': followee_username,
+                'follower_username': follower_username
+                }
+        data = {
+                'command': 'follow',
+                'followee_username': followee_username,
+                'token': token
+                }
+        follower_reply_channel.send({
+            'text': json.dumps(data)
             })
     except:
         print(traceback.format_exc())
