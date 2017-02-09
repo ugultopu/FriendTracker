@@ -20,7 +20,8 @@ from FriendTrackerApp import views
 urlpatterns = [
     url(r'^login/$', views.login),
     url(r'^register/$', views.register),
-    url(r'^follow/$', views.follow),
+    url(r'^follow_request/$', views.follow_request),
+    url(r'^follow_response/$', views.follow_response),
     url(r'^location/ops/$', views.location_operations),
     url(r'^admin/', admin.site.urls),
 ]

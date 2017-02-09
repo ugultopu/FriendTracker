@@ -59,7 +59,7 @@ def register(request):
 
 
 @csrf_exempt
-def follow(request):
+def follow_request(request):
     followee_username = request.user.username
     try:
         follower_username = request.POST['username']
@@ -84,7 +84,7 @@ def follow(request):
                 'follower_username': follower_username
                 }
         data = {
-                'command': 'follow',
+                'command': 'follow_request',
                 'followee_username': followee_username,
                 'token': token
                 }
@@ -94,6 +94,46 @@ def follow(request):
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Cannot send follow request'}))
+    return HttpResponse(json.dumps({'status': 'Success'}))
+
+
+@csrf_exempt
+def follow_response(request):
+    follower_username = request.user.username
+    try:
+        request_body = json.loads(request.body)
+    except:
+        print(traceback.format_exc())
+        return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
+    token = request_body['token']
+    response = request_body['response']
+    try:
+        follow_request = follow_requests[token]
+    except:
+        print(traceback.format_exc())
+        return HttpResponse(json.dumps({'status': 'Non-existent follow request'}))
+    # TODO Determine if it is necessary to check for follower username at the
+    # follow request
+    if follow_request['follower_username'] != follower_username:
+        return HttpResponse(json.dumps({'status': 'Follower names do not match'}))
+    followee_username = follow_request['followee_username']
+    if response == 'Follow':
+        try:
+            follows[follower_username].append(followee_username)
+        except:
+            follows[follower_username] = [followee_username]
+            # follows[follower_username].append(followee_username)
+        data = {'response': 'Follow'}
+    elif response == 'No follow':
+        data = {'response': 'No follow'}
+    else:
+        return HttpResponse(json.dumps({'status': 'Unknown follow response'}))
+    data['command'] = 'follow_response'
+    data['follower_username'] = follower_username
+    reply_channels[followee_username].send({
+        'text': json.dumps(data)
+        })
+    del follow_requests[token]
     return HttpResponse(json.dumps({'status': 'Success'}))
 
 
