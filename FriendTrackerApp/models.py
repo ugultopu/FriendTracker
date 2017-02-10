@@ -19,14 +19,13 @@ class PinnedLocation(models.Model):
     longitude = models.FloatField()
 
 
-class OnlineUser(models.Model):
-    user = models.ForeignKey(User)
-    reply_channel = models.TextField()
-
-
 class Follower(models.Model):
-    follower = models.ForeignKey(User, related_name='follower')
-    followee = models.ForeignKey(User, related_name='followee')
+    follower = models.ForeignKey(User, related_name='%(class)s_follower')
+    followee = models.ForeignKey(User, related_name='%(class)s_followee')
+
+class FollowRequest(models.Model):
+    followee = models.ForeignKey(User, related_name='%(class)s_followee')
+    follower = models.ForeignKey(User, related_name='%(class)s_follower')
 
 
 class CustomSession(AbstractBaseSession):

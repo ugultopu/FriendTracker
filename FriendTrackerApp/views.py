@@ -29,7 +29,7 @@ def login(request):
             else:
                 return HttpResponse(json.dumps({'status': 'Empty session key'}))
         except Exception as e:
-            detlog(e)
+            print(traceback.format_exc())
             return HttpResponse(json.dumps({'status': 'Cannot log in'}))
     else:
         return HttpResponse(json.dumps({'status': 'Cannot authenticate'}))
@@ -71,6 +71,9 @@ def follow_request(request):
     # TODO Decide if it should be possible to follow yourself
     # if follower_username == followee_username:
     #     return HttpResponse(json.dumps({'status': 'Success'}))
+
+    if follower_username in follows:
+        return HttpResponse(json.dumps({'status': 'Follower already follows'}))
 
     try:
         follower_reply_channel = reply_channels[follower_username]
@@ -122,7 +125,6 @@ def follow_response(request):
             follows[follower_username].append(followee_username)
         except:
             follows[follower_username] = [followee_username]
-            # follows[follower_username].append(followee_username)
         data = {'response': 'Follow'}
     elif response == 'No follow':
         data = {'response': 'No follow'}
