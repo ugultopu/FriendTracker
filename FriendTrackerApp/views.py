@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from FriendTrackerApp.models import Follower, PinnedLocation
+from FriendTrackerApp.models import Follow, PinnedLocation
 from django.core import serializers
 import uuid
 import json

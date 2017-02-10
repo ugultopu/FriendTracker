@@ -19,7 +19,7 @@ class PinnedLocation(models.Model):
     longitude = models.FloatField()
 
 
-class Follower(models.Model):
+class Follow(models.Model):
     follower = models.ForeignKey(User, related_name='%(class)s_follower')
     followee = models.ForeignKey(User, related_name='%(class)s_followee')
 

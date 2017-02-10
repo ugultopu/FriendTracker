@@ -1,6 +1,6 @@
 from channels.auth import channel_session_user_from_http, channel_session_user
 from channels import Group
-from FriendTrackerApp.models import Location, Follower, CustomSession
+from FriendTrackerApp.models import Location, Follow, CustomSession
 from FriendTrackerApp.views import reply_channels
 from .detlogging import detlog
 import json
