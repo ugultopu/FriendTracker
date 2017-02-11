@@ -2,17 +2,24 @@ from django.shortcuts import render
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from FriendTrackerApp.models import Follow, PinnedLocation
+from FriendTrackerApp.models import User, Follow, FollowRequest, PinnedLocation
 from django.core import serializers
 import uuid
 import json
 from .detlogging import detlog
 import traceback
 
+# FIXME Decide where to put the following.
+#
+# It cannot be put into a database table, because a Berkeley Socket (that is,
+# the Python implementation of a Berkeley Socket) cannot be serialized. This is
+# by definition of Python Sockets. That is, a Python socket has a built in
+# exception which is thrown when it is tried to be serialized.
+#
+# Maybe putting it into Redis is a good option.
 reply_channels = {}
-follows = {}
-follow_requests = {}
 
 @csrf_exempt
 def login(request):
@@ -59,36 +66,43 @@ def register(request):
 
 
 @csrf_exempt
+@login_required
 def follow_request(request):
-    followee_username = request.user.username
+    followee = User.objects.get(username=request.user.username)
     try:
-        follower_username = request.POST['username']
-        follower = User.objects.get(username=follower_username)
+        follower = User.objects.get(username=request.POST['username'])
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Follower not found'}))
+
+    try:
+        follower_reply_channel = reply_channels[follower.id]
+    except:
+        print(traceback.format_exc())
+        return HttpResponse(json.dumps({'status': 'Follower offline'}))
 
     # TODO Decide if it should be possible to follow yourself
     # if follower_username == followee_username:
     #     return HttpResponse(json.dumps({'status': 'Success'}))
 
-    if follower_username in follows:
-        return HttpResponse(json.dumps({'status': 'Follower already follows'}))
+    try:
+        FollowRequest.objects.get(follower=follower, followee=followee)
+        return HttpResponse(json.dumps({'status': 'Follow request exists'}))
+    except:
+        pass
 
     try:
-        follower_reply_channel = reply_channels[follower_username]
+        Follow.objects.get(follower=follower, followee=followee)
+        return HttpResponse(json.dumps({'status': 'Follower already follows'}))
     except:
-        print(traceback.format_exc())
-        return HttpResponse(json.dumps({'status': 'Follower offline'}))
+        pass
+
     try:
         token = str(uuid.uuid4())
-        follow_requests[token] = {
-                'followee_username': followee_username,
-                'follower_username': follower_username
-                }
+        FollowRequest(token=token, followee=followee, follower=follower).save()
         data = {
                 'command': 'follow_request',
-                'followee_username': followee_username,
+                'followee_username': request.user.username,
                 'token': token
                 }
         follower_reply_channel.send({
@@ -101,45 +115,52 @@ def follow_request(request):
 
 
 @csrf_exempt
+@login_required
 def follow_response(request):
-    follower_username = request.user.username
+    follower = request.user
+
     try:
         request_body = json.loads(request.body)
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Invalid JSON'}))
+
     token = request_body['token']
     response = request_body['response']
+
+    # TODO Determine if it is necessary to check for follower username at the
+    # follow request
     try:
-        follow_request = follow_requests[token]
+        follow_request = FollowRequest.objects.get(token=token, follower=follower)
     except:
         print(traceback.format_exc())
         return HttpResponse(json.dumps({'status': 'Non-existent follow request'}))
-    # TODO Determine if it is necessary to check for follower username at the
-    # follow request
-    if follow_request['follower_username'] != follower_username:
-        return HttpResponse(json.dumps({'status': 'Follower names do not match'}))
-    followee_username = follow_request['followee_username']
+
+    followee = follow_request.followee
+
     if response == 'Follow':
         try:
-            follows[follower_username].append(followee_username)
+            Follow(follower=follower, followee=followee).save()
         except:
-            follows[follower_username] = [followee_username]
+            print(traceback.format_exc())
+            return HttpResponse(json.dumps({'status': 'Cannot save follow request'}))
         data = {'response': 'Follow'}
     elif response == 'No follow':
         data = {'response': 'No follow'}
     else:
         return HttpResponse(json.dumps({'status': 'Unknown follow response'}))
+
     data['command'] = 'follow_response'
-    data['follower_username'] = follower_username
-    reply_channels[followee_username].send({
+    data['follower_username'] = follower.username
+    reply_channels[follower.id].send({
         'text': json.dumps(data)
         })
-    del follow_requests[token]
+    follow_request.delete()
     return HttpResponse(json.dumps({'status': 'Success'}))
 
 
 @csrf_exempt
+@login_required
 def location_operations(request):
     try:
         request_body = json.loads(request.body)

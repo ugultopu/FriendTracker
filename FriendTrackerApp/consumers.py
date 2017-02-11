@@ -10,7 +10,7 @@ import json
 def location_connect(message):
     message.http_session.flush()
     message.http_session.modified = False
-    reply_channels[message.user.username] = message.reply_channel
+    reply_channels[message.user.id] = message.reply_channel
     Group('online-users').add(message.reply_channel)
     data = {'sessionid': message.channel_session.session_key}
     message.reply_channel.send({
@@ -47,6 +47,6 @@ def location_disconnect(message):
     # logged out (that is, disconnected).
     message.channel_session.flush()
     message.channel_session.modified = False
-    del reply_channels[message.user.username]
+    del reply_channels[message.user.id]
     Group('online-users').discard(message.reply_channel)
 

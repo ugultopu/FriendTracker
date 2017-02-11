@@ -24,6 +24,7 @@ class Follow(models.Model):
     followee = models.ForeignKey(User, related_name='%(class)s_followee')
 
 class FollowRequest(models.Model):
+    token = models.TextField()
     followee = models.ForeignKey(User, related_name='%(class)s_followee')
     follower = models.ForeignKey(User, related_name='%(class)s_follower')
 
