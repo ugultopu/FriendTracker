@@ -152,7 +152,7 @@ def follow_response(request):
 
     data['command'] = 'follow_response'
     data['follower_username'] = follower.username
-    reply_channels[follower.id].send({
+    reply_channels[followee.id].send({
         'text': json.dumps(data)
         })
     follow_request.delete()
