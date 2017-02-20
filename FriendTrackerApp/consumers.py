@@ -25,9 +25,19 @@ def location_receive(message):
     data['user'] = message.user.id
     print(data)
     data['command'] = 'location'
-    Group('online-users').send({
-        'text': json.dumps(data)
-    })
+    accuracy = data['accuracy']
+    # We don't check if accuracy is less than 0, because this check is already
+    # being done at the client. I choose not to do this check on the server,
+    # because this method is the busiest method of the application.
+    #
+    # if accuracy >= 0 && accuracy <= 5:
+    #
+    # FIXME Don't use a "magic number". Put the 5 (or another number) to a
+    # constant (or variable, or enum, etc.) and use this constant.
+    if accuracy <= 5:
+        Group('online-users').send({
+            'text': json.dumps(data)
+        })
 
 
 @channel_session_user
