@@ -1,5 +1,5 @@
 case "$1" in
-	d|dev)
+	dev)
 		kill_processes() {
 			kill $stunnel_pid
 			# For some reason, it seems like we don't need to kill the Redis manually.
@@ -12,13 +12,12 @@ case "$1" in
 		stunnel_pid=$!
 		python manage.py runserver
 		;;
-	p|prod)
+	prod)
 		nohup stunnel stunnel/dev_https &
 		nohup python manage.py runserver &
 		;;
 	*)
 		echo "Usage:
-	script/runserver (d|dev)
-	script/runserver (p|prod)"
+	script/runserver (dev|prod)"
 esac
 
