@@ -21,3 +21,4 @@ build/
 tests/report/
 db.sqlite3
 stunnel.log
+nohup.out
