@@ -1,12 +1,24 @@
-kill_processes() {
-	kill $stunnel_pid
-	# For some reason, it seems like we don't need to kill the Redis manually.
-	# kill $redis_pid
-}
-trap kill_processes exit
-redis-server &
-redis_pid=$!
-stunnel stunnel/dev_https &
-stunnel_pid=$!
-python manage.py runserver
+case "$1" in
+	d|dev)
+		kill_processes() {
+			kill $stunnel_pid
+			# For some reason, it seems like we don't need to kill the Redis manually.
+			# kill $redis_pid
+		}
+		trap kill_processes exit
+		redis-server &
+		redis_pid=$!
+		stunnel stunnel/dev_https &
+		stunnel_pid=$!
+		python manage.py runserver
+		;;
+	p|prod)
+		nohup stunnel stunnel/dev_https &
+		nohup python manage.py runserver &
+		;;
+	*)
+		echo "Usage:
+	script/runserver (d|dev)
+	script/runserver (p|prod)"
+esac
 
