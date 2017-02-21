@@ -13,6 +13,7 @@ case "$1" in
 		python manage.py runserver
 		;;
 	prod)
+		export PYTHONUNBUFFERED="True"
 		nohup stunnel stunnel/dev_https &
 		nohup python manage.py runserver &
 		;;
