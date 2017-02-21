@@ -34,10 +34,27 @@ def location_receive(message):
     #
     # FIXME Don't use a "magic number". Put the 5 (or another number) to a
     # constant (or variable, or enum, etc.) and use this constant.
-    if accuracy <= 5:
-        Group('online-users').send({
-            'text': json.dumps(data)
-        })
+    if accuracy <= 10:
+        location_receive.counter -= 1
+        if location_receive.counter == average_count_number - 1:
+            location_receive.latitude = data['latitude']
+            location_receive.longitude = data['longitude']
+        else:
+            location_receive.latitude += data['latitude']
+            location_receive.longitude += data['longitude']
+            if location_receive.counter == 0:
+                data['latitude'] = location_receive.latitude / average_count_number
+                data['longitude'] = location_receive.longitude / average_count_number
+                Group('online-users').send({
+                    'text': json.dumps(data)
+                })
+                location_receive.counter = average_count_number
+
+
+average_count_number = 5
+location_receive.counter = average_count_number
+location_receive.latitude = 0
+location_receive.longitude = 0
 
 
 @channel_session_user
