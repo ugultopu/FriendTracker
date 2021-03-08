@@ -7,7 +7,7 @@
 1. `python -m venv FriendTracker-Env`
 2. `cd FriendTracker-Env`
 3. `source bin/activate`
-4. `git clone git@bitbucket.org:ugultopu/FriendTracker.git`
+4. `git clone git@github.com:ugultopu/FriendTracker.git`
 5. `cd FriendTracker`
 6. `script/setup`
 7. `script/runserver`
